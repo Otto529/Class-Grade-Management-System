@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}班级成绩管理系统{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="logo">📊 成绩管理系统</div>
+    <nav>
+      <a href="{{ url_for('page_dashboard') }}"  class="{{ 'active' if request.path=='/' }}">工作台</a>
+      <a href="{{ url_for('page_students') }}"   class="{{ 'active' if request.path=='/students' }}">学生信息管理</a>
+      <a href="{{ url_for('page_scores') }}"     class="{{ 'active' if request.path=='/scores' }}">成绩录入</a>
+      <a href="{{ url_for('page_stats') }}"      class="{{ 'active' if request.path=='/stats' }}">成绩统计</a>
+      <a href="{{ url_for('page_ranking') }}"    class="{{ 'active' if request.path=='/ranking' }}">排名查询</a>
+    </nav>
+    <div class="sidebar-footer">Python · Flask · MySQL</div>
+  </aside>
+  <main class="content">
+    {% block content %}{% endblock %}
+  </main>
+</div>
+<div id="toast"></div>
+<script src="{{ url_for('static', filename='js/common.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

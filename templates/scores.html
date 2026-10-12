@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}成绩录入{% endblock %}
+{% block content %}
+<div class="page-title">成绩录入</div>
+
+<div class="card">
+  <div class="toolbar">
+    <label>考试：</label>
+    <select id="examSel" onchange="reload()">
+      {% for e in exams %}
+      <option value="{{ e.id }}" {{ 'selected' if exam_id==e.id }}>{{ e.name }}</option>
+      {% endfor %}
+    </select>
+    <label>班级：</label>
+    <select id="classSel" onchange="reload()">
+      {% for c in classes %}
+      <option value="{{ c.id }}" {{ 'selected' if class_id==c.id }}>{{ c.class_name }}</option>
+      {% endfor %}
+    </select>
+    <span class="spacer"></span>
+    <a class="btn ghost" href="/template/scores">下载成绩模板</a>
+    <button class="btn ghost" type="button" onclick="document.getElementById('scoreFile').click()">📥 Excel导入成绩</button>
+    <button class="btn ghost" type="button" onclick="openExamModal()">＋ 新建考试</button>
+    <button class="btn" type="button" onclick="saveAll()">💾 保存成绩</button>
+    <input type="file" id="scoreFile" accept=".xlsx" hidden onchange="importScore(this)">
+  </div>
+
+  {% if grid %}
+  <div class="score-grid">
+    <table>
+      <thead>
+        <tr><th class="stu-info">学号</th><th class="stu-info">姓名</th>
+          {% for su in subjects %}<th>{{ su.name }}<br><span class="muted" style="font-weight:400">满分{{ su.full_score|int }}</span></th>{% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+      {% for row in grid %}
+        <tr data-student="{{ row.student_id }}">
+          <td class="stu-info">{{ row.student_no }}</td>
+          <td class="stu-info">{{ row.name }}</td>
+          {% for su in subjects %}
+          <td><input type="number" min="0" max="{{ su.full_score|int }}" step="0.5"
+                     data-subject="{{ su.id }}" value="{{ row.scores[loop.index0] if row.scores[loop.index0] is not none else '' }}"></td>
+          {% endfor %}
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="muted">请先选择考试与班级；如无考试请点击「新建考试」。</p>
+  {% endif %}
+</div>
+
+<div class="modal-mask" id="examModal">
+  <div class="modal">
+    <h3>新建考试</h3>
+    <div class="form-row"><label>考试名称</label><input id="e_name" placeholder="如 2026秋季期末考试"></div>
+    <div class="form-row"><label>考试日期</label><input id="e_date" type="date"></div>
+    <div class="form-row"><label>备注</label><input id="e_remark"></div>
+    <div class="modal-actions">
+      <button class="btn ghost" onclick="closeExamModal()">取消</button>
+      <button class="btn" onclick="createExam()">创建</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/scores.js') }}"></script>
+{% endblock %}

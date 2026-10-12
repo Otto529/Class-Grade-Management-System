@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}成绩统计{% endblock %}
+{% block content %}
+<div class="page-title">成绩统计</div>
+
+<div class="card">
+  <div class="toolbar">
+    <label>考试：</label>
+    <select id="examSel">
+      {% for e in exams %}<option value="{{ e.id }}">{{ e.name }}</option>{% endfor %}
+    </select>
+    <label>班级：</label>
+    <select id="classSel">
+      <option value="">全部班级</option>
+      {% for c in classes %}<option value="{{ c.id }}">{{ c.class_name }}</option>{% endfor %}
+    </select>
+    <button class="btn" onclick="loadStats()">查询</button>
+    <span class="spacer"></span>
+    <a class="btn" id="exportBtn" href="#">📤 导出成绩册(Excel)</a>
+  </div>
+</div>
+
+<div class="chart-row">
+  <div class="card">
+    <h3>各科平均分</h3>
+    <div class="bar-chart" id="avgChart"></div>
+    <div class="legend"><span>柱顶数字为平均分，括号内为该科满分</span></div>
+  </div>
+  <div class="card">
+    <h3>分数段分布（人数占比）</h3>
+    <div class="legend">
+      <span><i style="background:#ef5b5b"></i>不及格</span>
+      <span><i style="background:#f0a03b"></i>60-70%</span>
+      <span><i style="background:#e8d24b"></i>70-80%</span>
+      <span><i style="background:#7bc47f"></i>80-85%</span>
+      <span><i style="background:#22b07d"></i>优秀≥85%</span>
+    </div>
+    <div id="distBox"></div>
+  </div>
+</div>
+
+<div class="card">
+  <h3>科目明细统计</h3>
+  <table>
+    <thead><tr><th>科目</th><th>满分</th><th>参考人数</th><th>平均分</th>
+      <th>最高分</th><th>最低分</th><th>及格率</th><th>优秀率</th></tr></thead>
+    <tbody id="statsBody"></tbody>
+  </table>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/stats.js') }}"></script>
+{% endblock %}

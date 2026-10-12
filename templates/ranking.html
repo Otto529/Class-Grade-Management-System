@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}排名查询{% endblock %}
+{% block content %}
+<div class="page-title">排名查询</div>
+
+<div class="card">
+  <div class="toolbar">
+    <label>考试：</label>
+    <select id="examSel">
+      {% for e in exams %}<option value="{{ e.id }}">{{ e.name }}</option>{% endfor %}
+    </select>
+    <label>范围：</label>
+    <select id="classSel">
+      <option value="">全部班级</option>
+      {% for c in classes %}<option value="{{ c.id }}">{{ c.class_name }}</option>{% endfor %}
+    </select>
+    <label>类型：</label>
+    <select id="subjectSel">
+      <option value="">总分排名</option>
+      {% for s in subjects %}<option value="{{ s.id }}">{{ s.name }}单科排名</option>{% endfor %}
+    </select>
+    <button class="btn" onclick="loadRank()">查询</button>
+    <span class="spacer"></span>
+    <button class="btn" onclick="exportCsv()">📤 导出当前排名(CSV)</button>
+  </div>
+
+  <table>
+    <thead id="rankHead"></thead>
+    <tbody id="rankBody"></tbody>
+  </table>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/ranking.js') }}"></script>
+{% endblock %}

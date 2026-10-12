@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}学生信息管理{% endblock %}
+{% block content %}
+<div class="page-title">学生信息管理</div>
+
+<div class="card">
+  <form class="toolbar" method="get">
+    <select name="class_id" onchange="this.form.submit()">
+      <option value="">全部班级</option>
+      {% for c in classes %}
+      <option value="{{ c.id }}" {{ 'selected' if cur_class==c.id }}>{{ c.class_name }}</option>
+      {% endfor %}
+    </select>
+    <input name="keyword" value="{{ keyword }}" placeholder="搜索姓名 / 学号">
+    <button class="btn ghost" type="submit">查询</button>
+    <span class="spacer"></span>
+    <a class="btn ghost" href="/template/students">下载名单模板</a>
+    <button class="btn ghost" type="button" onclick="document.getElementById('stuFile').click()">📥 Excel导入</button>
+    <button class="btn" type="button" onclick="openStuModal()">＋ 新增学生</button>
+    <button class="btn ghost" type="button" onclick="openClassModal()">班级管理</button>
+    <input type="file" id="stuFile" accept=".xlsx" hidden
+           onchange="doImport(this,'/import/students')">
+  </form>
+
+  <table>
+    <thead><tr><th>学号</th><th>姓名</th><th>性别</th><th>班级</th><th>状态</th><th>操作</th></tr></thead>
+    <tbody>
+    {% for s in students %}
+      <tr>
+        <td>{{ s.student_no }}</td>
+        <td>{{ s.name }}</td>
+        <td>{{ s.gender }}</td>
+        <td><span class="tag blue">{{ s.class_name }}</span></td>
+        <td>{% if s.status==1 %}<span class="tag green">在读</span>
+            {% else %}<span class="tag gray">休学/转出</span>{% endif %}</td>
+        <td>
+          <button class="btn sm ghost"
+            onclick='openStuModal({{ s|tojson }})'>编辑</button>
+          <button class="btn sm danger" onclick="delStu({{ s.id }})">删除</button>
+        </td>
+      </tr>
+    {% else %}
+      <tr><td colspan="6" class="muted">暂无学生数据，可点击「Excel导入」批量添加。</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- 学生弹窗 -->
+<div class="modal-mask" id="stuModal">
+  <div class="modal">
+    <h3 id="stuModalTitle">新增学生</h3>
+    <input type="hidden" id="f_id">
+    <div class="form-row"><label>学号</label><input id="f_no"></div>
+    <div class="form-row"><label>姓名</label><input id="f_name"></div>
+    <div class="form-row"><label>性别</label>
+      <select id="f_gender"><option>男</option><option>女</option></select></div>
+    <div class="form-row"><label>班级</label>
+      <select id="f_class">
+        {% for c in classes %}<option value="{{ c.id }}">{{ c.class_name }}</option>{% endfor %}
+      </select></div>
+    <div class="modal-actions">
+      <button class="btn ghost" onclick="closeModal('stuModal')">取消</button>
+      <button class="btn" onclick="saveStu()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- 班级弹窗 -->
+<div class="modal-mask" id="classModal">
+  <div class="modal">
+    <h3>班级管理</h3>
+    <table>
+      {% for c in classes %}
+      <tr><td>{{ c.class_name }}</td><td class="muted">{{ c.grade or '' }}</td>
+        <td style="text-align:right"><button class="btn sm danger" onclick="delClass({{ c.id }})">删除</button></td></tr>
+      {% endfor %}
+    </table>
+    <h3 style="margin-top:16px">新增班级</h3>
+    <div class="form-row"><label>班级名称</label><input id="cf_name" placeholder="如 高三(3)班"></div>
+    <div class="form-row"><label>年级</label><input id="cf_grade" placeholder="如 2024级"></div>
+    <div class="modal-actions">
+      <button class="btn ghost" onclick="closeModal('classModal')">关闭</button>
+      <button class="btn" onclick="addClass()">添加</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/students.js') }}"></script>
+{% endblock %}

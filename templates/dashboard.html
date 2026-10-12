@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}工作台 · 班级成绩管理系统{% endblock %}
+{% block content %}
+<div class="page-title">工作台</div>
+
+<div class="stat-grid">
+  <div class="stat-card"><span class="icon">👨‍🎓</span>
+    <div class="label">在读学生</div><div class="num blue">{{ data.student_count }}</div></div>
+  <div class="stat-card"><span class="icon">🏫</span>
+    <div class="label">班级数量</div><div class="num green">{{ data.class_count }}</div></div>
+  <div class="stat-card"><span class="icon">📝</span>
+    <div class="label">考试场次</div><div class="num orange">{{ data.exam_count }}</div></div>
+  <div class="stat-card"><span class="icon">📈</span>
+    <div class="label">成绩记录</div><div class="num red">{{ data.score_count }}</div></div>
+</div>
+
+<div class="card">
+  <div class="toolbar" style="margin-bottom:14px">
+    <h3 style="margin-bottom:0">最近考试</h3>
+    <span class="spacer"></span>
+    <button class="btn" type="button" onclick="openExamModal()">＋ 新增考试</button>
+  </div>
+  <table>
+    <thead><tr><th>考试名称</th><th>考试日期</th><th>备注</th><th>操作</th></tr></thead>
+    <tbody>
+    {% for e in data.latest_exams %}
+      <tr>
+        <td>{{ e.name }}</td>
+        <td>{{ e.exam_date or '—' }}</td>
+        <td class="muted">{{ e.remark or '—' }}</td>
+        <td>
+          <button class="btn sm ghost" type="button"
+            onclick='openExamModal({{ e|tojson }})'>编辑资料</button>
+          <a class="btn sm ghost" href="/scores?exam_id={{ e.id }}">录入成绩</a>
+          <a class="btn sm ghost" href="/stats?exam_id={{ e.id }}">统计</a>
+          <a class="btn sm" href="/export/report?exam_id={{ e.id }}">导出</a>
+        </td>
+      </tr>
+    {% else %}
+      <tr><td colspan="4" class="muted">暂无考试，点击右上角「新增考试」创建。</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- 新增 / 编辑考试弹窗 -->
+<div class="modal-mask" id="examModal">
+  <div class="modal">
+    <h3 id="examModalTitle">新增考试</h3>
+    <input type="hidden" id="e_id">
+    <div class="form-row"><label>考试名称</label>
+      <input id="e_name" placeholder="如 2026秋季期末考试"></div>
+    <div class="form-row"><label>考试日期</label><input id="e_date" type="date"></div>
+    <div class="form-row"><label>备注</label><input id="e_remark"></div>
+    <div class="modal-actions">
+      <button class="btn ghost" onclick="closeExamModal()">取消</button>
+      <button class="btn" onclick="saveExam()">保存</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}
